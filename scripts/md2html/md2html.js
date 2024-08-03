@@ -36,7 +36,7 @@ const md = require('markdown-it')({
   highlight: function (str, lang) {
       if (lang && hljs.getLanguage(lang)) { // && !argv.respec) {
           try {
-              return '<pre class="nohighlight"><code>' +
+              return '<pre class="nohighlight" tabindex="0"><code>' +
                   hljs.highlight(str, { language: lang }).value +
                   '</code></pre>';
           } catch (__) { }
@@ -86,56 +86,9 @@ function preface(title,options) {
                 ],
             },
         ],
-        localBiblio: {
-            "OpenAPI-Learn": {
-                title: "OpenAPI - Getting started, and the specification explained",
-                href: "https://learn.openapis.org/",
-                publisher: "OpenAPI Initiative"
-            },
-            "OpenAPI-Registry": {
-                title: "OpenAPI Initiative Registry",
-                href: "https://spec.openapis.org/registry/index.html",
-                publisher: "OpenAPI Initiative"
-            },
-            //TODO: remove localBiblio once Specref PRs https://github.com/tobie/specref/pulls/ralfhandl are merged
-            "JSON-Schema-Validation-04": {
-                authors: [ "Kris Zyp", "Francis Galiegue", "Gary Court" ],
-                href: "https://datatracker.ietf.org/doc/html/draft-fge-json-schema-validation-00",
-                publisher: "Internet Engineering Task Force (IETF)",
-                status: "Internet-Draft",
-                title: "JSON Schema: interactive and non interactive validation. Draft 4",
-                date: "1 February 2013"
-            },
-            "JSON-Schema-05": {
-                authors: [ "Austin Wright" ],
-                href: "https://datatracker.ietf.org/doc/html/draft-wright-json-schema-00",
-                publisher: "Internet Engineering Task Force (IETF)",
-                status: "Internet-Draft",
-                title: "JSON Schema: A Media Type for Describing JSON Documents. Draft 5",
-                date: "13 October 2016"
-            },
-            "JSON-Schema-Validation-05": {
-                authors: [ "Austin Wright", "G. Luff" ],
-                href: "https://datatracker.ietf.org/doc/html/draft-wright-json-schema-validation-00",
-                publisher: "Internet Engineering Task Force (IETF)",
-                status: "Internet-Draft",
-                title: "JSON Schema Validation: A Vocabulary for Structural Validation of JSON. Draft 5",
-                date: "13 October 2016"
-            },
-            "JSON-Schema-Validation-2020-12": {
-                authors: [ "Austin Wright", "Henry Andrews", "Ben Hutton" ],
-                href: "https://datatracker.ietf.org/doc/html/draft-bhutton-json-schema-validation-00",
-                publisher: "Internet Engineering Task Force (IETF)",
-                status: "Internet-Draft",
-                title: "JSON Schema Validation: A Vocabulary for Structural Validation of JSON. Draft 2020-12",
-                date: "8 December 2020"
-            },
-            "SPDX": {
-                href: "https://spdx.org/licenses/",
-                title: "SPDX License List",
-                publisher: "Linux Foundation"
-          }
-        }
+        // localBiblio: {
+        //     // add local bibliography entries here, add them to https://www.specref.org/, and remove them here once published
+        // }
     };
 
     let preface = `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>${md.utils.escapeHtml(title)}</title>`;
@@ -153,11 +106,14 @@ function preface(title,options) {
         catch (ex) {}
         preface += '</head><body>';
         preface += '<style>';
+        //TODO: extract to oai.css
         preface += '#respec-ui { visibility: hidden; }';
-        preface += 'h1,h2,h3 { color: #629b34; }';
-        preface += '.dt-published { color: #629b34; } .dt-published::before { content: "Published "; }';
-        preface += 'a[href] { color: #45512c; }'; // third OAI colour is #8ad000
+        preface += '#title { color: #578000; } #subtitle { color: #578000; }';
+        preface += '.dt-published { color: #578000; } .dt-published::before { content: "Published "; }';
+        preface += 'h1,h2,h3,h4,h5,h6 { color: #578000; font-weight: normal; font-style: normal; }';
+        preface += 'a[href] { color: #45512c; }';
         preface += 'body:not(.toc-inline) #toc h2 { color: #45512c; }';
+        // preface += '.toc > li li li li li { font-size: 90%;}';
         preface += 'table { display: block; width: 100%; overflow: auto; }';
         preface += 'table th { font-weight: 600; }';
         preface += 'table th, table td { padding: 6px 13px; border: 1px solid #dfe2e5; }';
@@ -165,8 +121,10 @@ function preface(title,options) {
         preface += 'table tr:nth-child(2n) { background-color: #f6f8fa; }';
         preface += 'pre { background-color: #f6f8fa !important; }';
         preface += 'code { color: #c83500 } th code { color: inherit }';
-        preface += 'a.bibref { text-decoration: underline;}';
-        preface += fs.readFileSync(path.resolve(__dirname,'gist.css'),'utf8').split('\n').join(' ');
+        preface += 'a.bibref { font-weight: bold; text-decoration: underline;}';
+        preface += '.hljs-literal { color: #0076c0; } .hljs-name { color: #986801; } .hljs-attribute,.hljs-symbol,.hljs-string { color: #428030; }';
+        //TODO: end-of-extract
+        // preface += fs.readFileSync(path.resolve(__dirname,'gist.css'),'utf8').split('\n').join(' ');
         preface += '</style>';
         preface += `<h1 id="title">${title.split('|')[0]}</h1>`;
         preface += `<p class="copyright">Copyright © ${options.publishDate.getFullYear()} the Linux Foundation</p>`;
@@ -259,7 +217,6 @@ for (let l in lines) {
 
     if (line.startsWith('```')) {
         inCodeBlock = !inCodeBlock;
-        line += '\n'; // fixes formatting of first line of syntax-highlighted blocks
     }
 
     if (!inCodeBlock && line.startsWith('#')) {
@@ -361,7 +318,7 @@ for (let l in lines) {
         line = line.replace('[JSON Schema Specification Draft 2020-12](https://tools.ietf.org/html/draft-bhutton-json-schema-00)','[[JSON-Schema-2020-12|JSON Schema Specification Draft 2020-12]]');
         line = line.replace('[JSON Schema Core](https://tools.ietf.org/html/draft-bhutton-json-schema-00)','[[JSON-Schema-2020-12|JSON Schema Core]]');
         line = line.replace('[JSON Schema Validation](https://tools.ietf.org/html/draft-bhutton-json-schema-validation-00)','[[JSON-Schema-Validation-2020-12|JSON Schema Validation]]');
-        line = line.replace('[SPDX](https://spdx.org/licenses/)','[[SPDX]]');
+        line = line.replace('[SPDX](https://spdx.org/licenses/) license','[[SPDX-Licenses]]');
         line = line.replace('[XML namespaces](https://www.w3.org/TR/xml-names11/)','[[xml-names11|XML namespaces]]');
         line = line.replace('JSON standards. YAML,','[[RFC7159|JSON]] standards. [[YAML|YAML]],'); // 2.0.md only
         line = line.replace('JSON or YAML format.','[[RFC7159|JSON]] or [[YAML|YAML]] format.');
@@ -384,9 +341,14 @@ for (let l in lines) {
         if (delta>0) delta = 1;
         let prefix = '';
         let newSection = '<section>';
-        if (line.includes('## Version ')) {
+        const m = line.match(/# Version ([0-9.]+)$/);
+        if (m) {
             // our conformance section is headlined with 'Version x.y.z'
             newSection = '<section class="override" id="conformance">';
+            // adjust the heading to be at level 2
+            line = '#' + m[0];
+            delta = 1;
+            heading = 2;
         }
         if (line.includes('Appendix')) {
             newSection = '<section class="appendix">';
